@@ -108,49 +108,104 @@
   function getDestinationCandidates() {
     if (!selectedDeparture) return [];
     const depIds = selectedDeparture.ids || [selectedDeparture.id];
-    const candidates = new Map();
+
+    // Phase 1: 各stopIdの候補収集 & 同一路線上で同名重複するstopIdを検出
+    const byStopId = new Map(); // stopId -> { id, name, routes[] }
+    const disambigStopIds = new Set(); // 区別が必要なstopId
 
     for (const [, route] of Object.entries(timetableData)) {
-      // 出発バス停の全IDでルートを検索
       const depIdx = route.stops.findIndex(s => depIds.includes(s));
       if (depIdx === -1) continue;
 
-      // 出発バス停より後のバス停のみ候補とする
+      // この路線の出発以降で、同名バス停が複数回出るか調べる
+      const nameCount = {};
+      for (let i = depIdx + 1; i < route.stops.length; i++) {
+        const stop = stopsData.find(s => s.id === route.stops[i]);
+        if (!stop) continue;
+        const norm = normalizeText(stop.name);
+        nameCount[norm] = (nameCount[norm] || 0) + 1;
+      }
+
       for (let i = depIdx + 1; i < route.stops.length; i++) {
         const stopId = route.stops[i];
-        if (!candidates.has(stopId)) {
-          const stop = stopsData.find(s => s.id === stopId);
-          if (stop) {
-            candidates.set(stopId, { id: stopId, name: stop.name, routeName: route.routeName });
+        const stop = stopsData.find(s => s.id === stopId);
+        if (!stop) continue;
+        const norm = normalizeText(stop.name);
+
+        // 同名が2回以上 → 区別が必要
+        if (nameCount[norm] > 1) {
+          disambigStopIds.add(stopId);
+        }
+
+        if (!byStopId.has(stopId)) {
+          byStopId.set(stopId, { id: stopId, name: stop.name, routes: [route.routeName] });
+        } else {
+          const existing = byStopId.get(stopId);
+          if (!existing.routes.includes(route.routeName)) existing.routes.push(route.routeName);
+        }
+      }
+    }
+
+    // Phase 2: 正規化名でグループ化。区別が必要なものは個別エントリ
+    const nameGroups = new Map(); // normName -> [{ stopId, candidate, needsDisambig }]
+    for (const [stopId, c] of byStopId) {
+      const norm = normalizeText(c.name);
+      if (!nameGroups.has(norm)) nameGroups.set(norm, []);
+      nameGroups.get(norm).push({ stopId, candidate: c, needsDisambig: disambigStopIds.has(stopId) });
+    }
+
+    const result = [];
+    const circled = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
+
+    for (const [norm, entries] of nameGroups) {
+      const anyNeedsDisambig = entries.some(e => e.needsDisambig);
+
+      if (!anyNeedsDisambig) {
+        // 重複なし → 1つにまとめる
+        const allRoutes = [];
+        for (const e of entries) {
+          for (const r of e.candidate.routes) {
+            if (!allRoutes.includes(r)) allRoutes.push(r);
           }
         }
-      }
-    }
-
-    // 同名バス停をまとめる（正規化した名前でグループ化）
-    const byName = new Map();
-    for (const c of candidates.values()) {
-      const normalized = normalizeText(c.name);
-      if (!byName.has(normalized)) {
-        byName.set(normalized, { id: c.id, name: c.name, displayName: normalized, routes: [c.routeName] });
+        result.push({ id: entries[0].stopId, name: entries[0].candidate.name, displayName: norm, routes: allRoutes });
       } else {
-        const existing = byName.get(normalized);
-        if (!existing.routes.includes(c.routeName)) {
-          existing.routes.push(c.routeName);
+        // 同名重複あり → stopIdごとに個別表示
+        entries.sort((a, b) => a.stopId.localeCompare(b.stopId));
+        for (let i = 0; i < entries.length; i++) {
+          const { stopId, candidate } = entries[i];
+          const suffix = i < circled.length ? circled[i] : `(${i + 1})`;
+          result.push({
+            id: stopId,
+            ids: [stopId], // 特定のstopIdのみ
+            name: candidate.name,
+            displayName: `${norm}${suffix}`,
+            routes: [...candidate.routes],
+          });
         }
       }
     }
 
-    return Array.from(byName.values());
+    return result;
   }
 
   function setupAutocomplete(input, list, onSelect, getCandidates) {
+    // 2回目以降の呼び出しではコールバックだけ差し替える（リスナー重複防止）
+    if (input._acSetup) {
+      input._acGetCandidates = getCandidates;
+      input._acOnSelect = onSelect;
+      return;
+    }
+    input._acSetup = true;
+    input._acGetCandidates = getCandidates;
+    input._acOnSelect = onSelect;
+
     let activeIdx = -1;
     let items = [];
 
     input.addEventListener('input', () => {
       const query = input.value.trim();
-      items = getCandidates();
+      items = input._acGetCandidates();
 
       if (query) {
         items = items.filter(item => {
@@ -167,7 +222,7 @@
 
     input.addEventListener('focus', () => {
       if (input.value.trim() === '') {
-        items = getCandidates().slice(0, 50);
+        items = input._acGetCandidates().slice(0, 50);
         renderSuggestions(list, items, activeIdx);
         list.hidden = items.length === 0;
       }
@@ -186,7 +241,7 @@
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (activeIdx >= 0 && items[activeIdx]) {
-          onSelect(items[activeIdx]);
+          input._acOnSelect(items[activeIdx]);
           input.value = items[activeIdx].displayName || normalizeText(items[activeIdx].name);
           list.hidden = true;
         }
@@ -200,7 +255,7 @@
       if (!li) return;
       const idx = parseInt(li.dataset.index, 10);
       if (items[idx]) {
-        onSelect(items[idx]);
+        input._acOnSelect(items[idx]);
         input.value = items[idx].displayName || normalizeText(items[idx].name);
         list.hidden = true;
       }
@@ -239,7 +294,13 @@
 
   function onDestinationSelected(item) {
     const displayName = item.displayName || normalizeText(item.name);
-    const matchingIds = stopsData.filter(s => normalizeText(s.name) === displayName).map(s => s.id);
+    // 区別済み候補（ids付き）はそのIDを使う。それ以外は名前で再解決
+    let matchingIds;
+    if (item.ids) {
+      matchingIds = item.ids;
+    } else {
+      matchingIds = stopsData.filter(s => normalizeText(s.name) === displayName).map(s => s.id);
+    }
     selectedDestination = { id: matchingIds[0], ids: matchingIds, name: displayName };
 
     dayTabsEl.hidden = false;
@@ -260,7 +321,7 @@
     emptyState.hidden = true;
     histSection.hidden = true;
     renderTimetable();
-    addHistory(selectedDeparture.name, selectedDestination.name);
+    addHistory(selectedDeparture.name, selectedDestination.name, selectedDestination.ids);
     updateFavButton();
     favAction.hidden = false;
     renderBookmarks();
@@ -466,11 +527,11 @@
     localStorage.setItem(STORAGE_KEY_HIST, JSON.stringify(hist));
   }
 
-  function addHistory(dep, dest) {
+  function addHistory(dep, dest, destIds) {
     let hist = getHistory();
     // 同じ組み合わせがあれば削除して先頭に
     hist = hist.filter(h => !(h.dep === dep && h.dest === dest));
-    hist.unshift({ dep, dest });
+    hist.unshift({ dep, dest, destIds: destIds || null });
     if (hist.length > MAX_HISTORY) hist = hist.slice(0, MAX_HISTORY);
     saveHistory(hist);
   }
@@ -483,11 +544,12 @@
     if (!selectedDeparture || !selectedDestination) return;
     const dep = selectedDeparture.name;
     const dest = selectedDestination.name;
+    const destIds = selectedDestination.ids || null;
     let favs = getFavorites();
     if (isFavorite(dep, dest)) {
       favs = favs.filter(f => !(f.dep === dep && f.dest === dest));
     } else {
-      favs.unshift({ dep, dest });
+      favs.unshift({ dep, dest, destIds });
     }
     saveFavorites(favs);
     updateFavButton();
@@ -500,7 +562,7 @@
     favToggleBtn.classList.toggle('is-fav', starred);
   }
 
-  function selectRoute(dep, dest) {
+  function selectRoute(dep, dest, destIds) {
     // プログラムから出発・目的地を選択
     const displayDep = dep;
     const matchingDepIds = stopsData.filter(s => normalizeText(s.name) === displayDep).map(s => s.id);
@@ -509,7 +571,12 @@
     depInput.value = displayDep;
 
     const displayDest = dest;
-    const matchingDestIds = stopsData.filter(s => normalizeText(s.name) === displayDest).map(s => s.id);
+    let matchingDestIds;
+    if (destIds && destIds.length > 0) {
+      matchingDestIds = destIds;
+    } else {
+      matchingDestIds = stopsData.filter(s => normalizeText(s.name) === displayDest).map(s => s.id);
+    }
     if (matchingDestIds.length === 0) return;
     selectedDestination = { id: matchingDestIds[0], ids: matchingDestIds, name: displayDest };
     destInput.value = displayDest;
@@ -560,7 +627,7 @@
     const idx = parseInt(btn.dataset.index, 10);
     if (btn.dataset.type === 'fav') {
       const favs = getFavorites();
-      if (favs[idx]) selectRoute(favs[idx].dep, favs[idx].dest);
+      if (favs[idx]) selectRoute(favs[idx].dep, favs[idx].dest, favs[idx].destIds);
     } else if (btn.dataset.type === 'fav-del') {
       const favs = getFavorites();
       favs.splice(idx, 1);
@@ -575,7 +642,7 @@
     const idx = parseInt(btn.dataset.index, 10);
     if (btn.dataset.type === 'hist') {
       const hist = getHistory();
-      if (hist[idx]) selectRoute(hist[idx].dep, hist[idx].dest);
+      if (hist[idx]) selectRoute(hist[idx].dep, hist[idx].dest, hist[idx].destIds);
     } else if (btn.dataset.type === 'hist-del') {
       const hist = getHistory();
       hist.splice(idx, 1);
