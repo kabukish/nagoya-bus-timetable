@@ -1,0 +1,16 @@
+{
+  "name": "名古屋市営バス時刻表",
+  "short_name": "バス時刻表",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#00796b",
+  "theme_color": "#00796b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

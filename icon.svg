@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00897b"/>
+      <stop offset="100%" stop-color="#00695c"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Bus body -->
+  <rect x="96" y="140" width="320" height="220" rx="24" fill="#fff"/>
+  <!-- Windshield -->
+  <rect x="116" y="160" width="280" height="90" rx="12" fill="#b2dfdb"/>
+  <!-- Windows -->
+  <rect x="130" y="170" width="70" height="60" rx="8" fill="#00695c" opacity="0.6"/>
+  <rect x="221" y="170" width="70" height="60" rx="8" fill="#00695c" opacity="0.6"/>
+  <rect x="312" y="170" width="70" height="60" rx="8" fill="#00695c" opacity="0.6"/>
+  <!-- Route display -->
+  <rect x="180" y="270" width="152" height="36" rx="6" fill="#ff6f00"/>
+  <text x="256" y="296" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="22" fill="#fff">BUS</text>
+  <!-- Headlights -->
+  <circle cx="130" cy="330" r="14" fill="#ffeb3b"/>
+  <circle cx="382" cy="330" r="14" fill="#ffeb3b"/>
+  <!-- Wheels -->
+  <circle cx="160" cy="370" r="28" fill="#37474f"/>
+  <circle cx="160" cy="370" r="12" fill="#78909c"/>
+  <circle cx="352" cy="370" r="28" fill="#37474f"/>
+  <circle cx="352" cy="370" r="12" fill="#78909c"/>
+  <!-- Clock icon at top -->
+  <circle cx="256" cy="430" r="24" fill="none" stroke="#fff" stroke-width="4"/>
+  <line x1="256" y1="430" x2="256" y2="416" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  <line x1="256" y1="430" x2="268" y2="430" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+</svg>
