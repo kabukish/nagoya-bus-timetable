@@ -258,12 +258,12 @@
 
   function showResults() {
     emptyState.hidden = true;
-    favSection.hidden = true;
     histSection.hidden = true;
     renderTimetable();
     addHistory(selectedDeparture.name, selectedDestination.name);
     updateFavButton();
     favAction.hidden = false;
+    renderBookmarks();
 
     if (updateTimer) clearInterval(updateTimer);
     updateTimer = setInterval(renderTimetable, 60000);
