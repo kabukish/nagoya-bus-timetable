@@ -399,11 +399,11 @@
       nextBusSection.hidden = true;
     }
 
-    // 前後2本ずつに絞り込み（現在時刻の前2本 + 後2本）
+    // 前2本 + 現在時刻以降は最後まで表示
     let startIdx, endIdx;
     if (nextIdx >= 0) {
       startIdx = Math.max(0, nextIdx - 2);
-      endIdx = Math.min(trips.length, nextIdx + 3);
+      endIdx = trips.length;
     } else {
       // 全便が過去の場合、末尾4本を表示
       startIdx = Math.max(0, trips.length - 4);
