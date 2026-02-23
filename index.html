@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>名古屋市営バス時刻表</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>名古屋市営バス 時刻表</h1>
+    <div id="current-time" class="clock"></div>
+  </header>
+
+  <main>
+    <!-- バス停選択 -->
+    <section class="search-section">
+      <div class="field">
+        <label for="departure-input">出発バス停</label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="departure-input" placeholder="バス停名を入力..." autocomplete="off">
+          <ul id="departure-suggestions" class="suggestions" hidden></ul>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="destination-input">目的地バス停</label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="destination-input" placeholder="バス停名を入力..." autocomplete="off" disabled>
+          <ul id="destination-suggestions" class="suggestions" hidden></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- お気に入り・履歴 -->
+    <section id="favorites-section" class="bookmarks-section" hidden>
+      <h2>お気に入り</h2>
+      <ul id="favorites-list" class="bookmarks-list"></ul>
+    </section>
+
+    <section id="history-section" class="bookmarks-section" hidden>
+      <h2>履歴</h2>
+      <ul id="history-list" class="bookmarks-list"></ul>
+    </section>
+
+    <!-- 日種別切り替え -->
+    <section class="day-tabs" hidden id="day-tabs">
+      <button class="tab active" data-day="weekday">平日</button>
+      <button class="tab" data-day="saturday">土曜</button>
+      <button class="tab" data-day="holiday">休日</button>
+    </section>
+
+    <!-- お気に入り登録ボタン -->
+    <section id="fav-action" class="fav-action" hidden>
+      <button id="fav-toggle-btn" class="fav-btn"></button>
+    </section>
+
+    <!-- 次のバス情報 -->
+    <section id="next-bus" class="next-bus-section" hidden>
+      <h2>次のバス</h2>
+      <div class="next-bus-card">
+        <div class="next-bus-route" id="next-route"></div>
+        <div class="next-bus-times">
+          <div class="time-block">
+            <span class="time-label">出発</span>
+            <span class="time-value" id="next-departure"></span>
+          </div>
+          <div class="arrow">→</div>
+          <div class="time-block">
+            <span class="time-label">到着</span>
+            <span class="time-value" id="next-arrival"></span>
+          </div>
+          <div class="time-block">
+            <span class="time-label">所要</span>
+            <span class="time-value" id="next-duration"></span>
+          </div>
+        </div>
+        <div class="countdown" id="countdown"></div>
+      </div>
+    </section>
+
+    <!-- 時刻表一覧 -->
+    <section id="timetable-section" class="timetable-section" hidden>
+      <h2>時刻表</h2>
+      <div id="timetable-container"></div>
+    </section>
+
+    <!-- 初期メッセージ -->
+    <section id="empty-state" class="empty-state">
+      <p>出発バス停と目的地バス停を選択すると<br>時刻表が表示されます</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>データ出典: 名古屋市交通局 GTFS-JPオープンデータ</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
