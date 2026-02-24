@@ -13,7 +13,19 @@
 <body>
   <header>
     <h1>名古屋市営バス 時刻表</h1>
-    <div id="current-time" class="clock"></div>
+    <div class="header-right">
+      <div id="current-time" class="clock"></div>
+      <div class="theme-wrap">
+        <div class="theme-labels">
+          <span class="theme-label">Light</span>
+          <span class="theme-label">Dark</span>
+        </div>
+        <label class="theme-switch" title="ダークモード切替">
+          <input type="checkbox" id="theme-toggle">
+          <span class="theme-slider"></span>
+        </label>
+      </div>
+    </div>
   </header>
 
   <main>

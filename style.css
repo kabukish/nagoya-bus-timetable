@@ -17,6 +17,19 @@
   --highlight: #fff8e1;
 }
 
+[data-theme="dark"] {
+  --primary: #26a69a;
+  --primary-dark: #80cbc4;
+  --primary-light: #1a3a36;
+  --accent: #ffab40;
+  --bg: #121212;
+  --card: #1e1e1e;
+  --text: #e0e0e0;
+  --text-secondary: #9e9e9e;
+  --border: #333333;
+  --highlight: #2a2510;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
   background: var(--bg);
@@ -41,15 +54,90 @@ header {
   z-index: 100;
 }
 
+[data-theme="dark"] header {
+  background: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
 header h1 {
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .clock {
   font-size: 1.3rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+.theme-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.theme-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 48px;
+}
+
+.theme-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  opacity: 0.7;
+  letter-spacing: 0.02em;
+}
+
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-slider {
+  position: absolute;
+  inset: 0;
+  background: #aaa;
+  border-radius: 28px;
+  transition: background 0.3s;
+}
+
+.theme-slider::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.theme-switch input:checked + .theme-slider {
+  background: #4cd964;
+}
+
+.theme-switch input:checked + .theme-slider::before {
+  transform: translateX(20px);
 }
 
 /* Main */
@@ -103,7 +191,7 @@ main {
 .autocomplete-wrap input:focus {
   outline: none;
   border-color: var(--primary);
-  background: white;
+  background: var(--card);
 }
 
 .autocomplete-wrap input:disabled {
@@ -116,7 +204,7 @@ main {
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: 8px;
   max-height: 240px;
@@ -163,7 +251,7 @@ main {
   flex: 1;
   padding: 8px;
   border: 2px solid var(--primary);
-  background: white;
+  background: var(--card);
   color: var(--primary);
   border-radius: 8px;
   font-size: 0.9rem;
@@ -369,7 +457,7 @@ main {
   padding: 8px 20px;
   border: 2px solid var(--accent);
   border-radius: 8px;
-  background: white;
+  background: var(--card);
   color: var(--accent);
   font-size: 0.9rem;
   font-weight: 600;
