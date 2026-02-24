@@ -35,6 +35,31 @@
   const favAction = document.getElementById('fav-action');
   const favToggleBtn = document.getElementById('fav-toggle-btn');
 
+  // --- Theme ---
+  const STORAGE_KEY_THEME = 'nagoya_bus_theme';
+  const themeToggle = document.getElementById('theme-toggle');
+
+  function initTheme() {
+    const saved = localStorage.getItem(STORAGE_KEY_THEME);
+    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeToggle.checked = true;
+    }
+  }
+
+  function toggleTheme() {
+    if (themeToggle.checked) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem(STORAGE_KEY_THEME, 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem(STORAGE_KEY_THEME, 'light');
+    }
+  }
+
+  themeToggle.addEventListener('change', toggleTheme);
+  initTheme();
+
   // --- Init ---
   async function init() {
     updateClock();
