@@ -186,6 +186,11 @@ main {
   font-size: 1rem;
   transition: border-color 0.2s;
   background: var(--bg);
+  color: var(--text);
+}
+
+.autocomplete-wrap input::placeholder {
+  color: var(--text-secondary);
 }
 
 .autocomplete-wrap input:focus {
