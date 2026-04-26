@@ -18,7 +18,9 @@
   const depSuggestions = document.getElementById('departure-suggestions');
   const destInput = document.getElementById('destination-input');
   const destSuggestions = document.getElementById('destination-suggestions');
+  const resultsControls = document.getElementById('results-controls');
   const dayTabsEl = document.getElementById('day-tabs');
+  const refreshBtn = document.getElementById('refresh-btn');
   const nextBusSection = document.getElementById('next-bus');
   const nextRouteEl = document.getElementById('next-route');
   const nextDepartureEl = document.getElementById('next-departure');
@@ -328,12 +330,12 @@
     }
     selectedDestination = { id: matchingIds[0], ids: matchingIds, name: displayName };
 
-    dayTabsEl.hidden = false;
     showResults();
   }
 
   // --- Results ---
   function hideResults() {
+    resultsControls.hidden = true;
     nextBusSection.hidden = true;
     timetableSection.hidden = true;
     favAction.hidden = true;
@@ -343,6 +345,7 @@
   }
 
   function showResults() {
+    resultsControls.hidden = false;
     emptyState.hidden = true;
     histSection.hidden = true;
     renderTimetable();
@@ -607,7 +610,6 @@
     destInput.value = displayDest;
     destInput.disabled = false;
 
-    dayTabsEl.hidden = false;
     showResults();
   }
 
@@ -685,6 +687,11 @@
     if (selectedDeparture && selectedDestination) {
       renderTimetable();
     }
+  });
+
+  refreshBtn.addEventListener('click', () => {
+    if (!selectedDeparture || !selectedDestination) return;
+    renderTimetable();
   });
 
   // --- Start ---

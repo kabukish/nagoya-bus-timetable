@@ -9,6 +9,8 @@
   --primary-dark: #004d40;
   --primary-light: #b2dfdb;
   --accent: #ff6f00;
+  --refresh: #1565c0;
+  --refresh-dark: #0d47a1;
   --bg: #f5f5f5;
   --card: #ffffff;
   --text: #212121;
@@ -22,6 +24,8 @@
   --primary-dark: #80cbc4;
   --primary-light: #1a3a36;
   --accent: #ffab40;
+  --refresh: #42a5f5;
+  --refresh-dark: #1e88e5;
   --bg: #121212;
   --card: #1e1e1e;
   --text: #e0e0e0;
@@ -245,11 +249,14 @@ main {
   margin-left: 6px;
 }
 
-/* Day Tabs */
+/* Result Controls */
+.results-controls {
+  margin-bottom: 16px;
+}
+
 .day-tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
 }
 
 .tab {
@@ -268,6 +275,28 @@ main {
 .tab.active {
   background: var(--primary);
   color: white;
+}
+
+.refresh-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--refresh);
+  border-radius: 8px;
+  background: var(--refresh);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.refresh-btn:hover {
+  background: var(--refresh-dark);
+  border-color: var(--refresh-dark);
+}
+
+.refresh-btn:active {
+  transform: translateY(1px);
 }
 
 /* Next Bus */
@@ -455,7 +484,13 @@ main {
 /* Favorite Action Button */
 .fav-action {
   margin-bottom: 16px;
-  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .fav-btn {
@@ -538,4 +573,10 @@ footer {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: 520px) {
+  .action-buttons {
+    flex-direction: column;
+  }
 }

@@ -69,15 +69,20 @@
     </section>
 
     <!-- 日種別切り替え -->
-    <section class="day-tabs" hidden id="day-tabs">
-      <button class="tab active" data-day="weekday">平日</button>
-      <button class="tab" data-day="saturday">土曜</button>
-      <button class="tab" data-day="holiday">休日</button>
+    <section id="results-controls" class="results-controls" hidden>
+      <div class="day-tabs" id="day-tabs">
+        <button class="tab active" data-day="weekday">平日</button>
+        <button class="tab" data-day="saturday">土曜</button>
+        <button class="tab" data-day="holiday">休日</button>
+      </div>
     </section>
 
-    <!-- お気に入り登録ボタン -->
+    <!-- 操作ボタン -->
     <section id="fav-action" class="fav-action" hidden>
-      <button id="fav-toggle-btn" class="fav-btn"></button>
+      <div class="action-buttons">
+        <button id="fav-toggle-btn" class="fav-btn" type="button"></button>
+        <button id="refresh-btn" class="refresh-btn" type="button">更新</button>
+      </div>
     </section>
 
     <!-- 次のバス情報 -->
