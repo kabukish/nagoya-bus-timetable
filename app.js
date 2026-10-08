@@ -8,6 +8,7 @@
   let selectedDestination = null; // {id, name}
   let currentDayType = 'weekday';
   let updateTimer = null;
+  let nextBusCopyText = '';
   const STORAGE_KEY_FAV = 'nagoya_bus_favorites';
   const STORAGE_KEY_HIST = 'nagoya_bus_history';
   const MAX_HISTORY = 10;
@@ -27,6 +28,8 @@
   const nextArrivalEl = document.getElementById('next-arrival');
   const nextDurationEl = document.getElementById('next-duration');
   const countdownEl = document.getElementById('countdown');
+  const copyNextBusBtn = document.getElementById('copy-next-bus-btn');
+  const copyStatusEl = document.getElementById('copy-status');
   const timetableSection = document.getElementById('timetable-section');
   const timetableContainer = document.getElementById('timetable-container');
   const emptyState = document.getElementById('empty-state');
@@ -335,6 +338,7 @@
 
   // --- Results ---
   function hideResults() {
+    setNextBusCopyText('');
     resultsControls.hidden = true;
     nextBusSection.hidden = true;
     timetableSection.hidden = true;
@@ -402,6 +406,7 @@
     const now = getCurrentTimeStr();
 
     if (trips.length === 0) {
+      setNextBusCopyText('');
       nextBusSection.hidden = true;
       timetableSection.hidden = true;
       emptyState.hidden = false;
@@ -422,8 +427,13 @@
       nextDepartureEl.textContent = formatTime(nextTrip.departure);
       nextArrivalEl.textContent = formatTime(nextTrip.arrival);
       nextDurationEl.textContent = calcDuration(nextTrip.departure, nextTrip.arrival);
+      setNextBusCopyText(
+        `${normalizeText(selectedDeparture.name)} → ${normalizeText(selectedDestination.name)}\n` +
+        `${formatTime(nextTrip.departure)} → ${formatTime(nextTrip.arrival)}（${calcDuration(nextTrip.departure, nextTrip.arrival)}）`
+      );
       updateCountdown(nextTrip.departure);
     } else {
+      setNextBusCopyText('');
       nextBusSection.hidden = true;
     }
 
@@ -476,6 +486,53 @@
       nextRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }
+
+  // --- Copy Next Bus ---
+  function setNextBusCopyText(text) {
+    if (text !== nextBusCopyText) copyStatusEl.textContent = '';
+    nextBusCopyText = text;
+    copyNextBusBtn.disabled = !text;
+  }
+
+  function copyWithTextarea(text) {
+    const previousFocus = document.activeElement;
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.readOnly = true;
+    textarea.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;font-size:16px;';
+    document.body.appendChild(textarea);
+    try {
+      textarea.select();
+      textarea.setSelectionRange(0, text.length);
+      if (!document.execCommand('copy')) throw new Error('Copy failed');
+    } finally {
+      textarea.remove();
+      if (previousFocus) previousFocus.focus({ preventScroll: true });
+    }
+  }
+
+  copyNextBusBtn.addEventListener('click', async () => {
+    const text = nextBusCopyText;
+    if (!text) return;
+    copyNextBusBtn.disabled = true;
+    copyStatusEl.textContent = '';
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          copyWithTextarea(text);
+        }
+      } else {
+        copyWithTextarea(text);
+      }
+      if (text === nextBusCopyText) copyStatusEl.textContent = '✓ コピー済み';
+    } catch {
+      if (text === nextBusCopyText) copyStatusEl.textContent = 'コピーできませんでした';
+    } finally {
+      copyNextBusBtn.disabled = !nextBusCopyText;
+    }
+  });
 
   // --- Utility ---
   function getCurrentTimeStr() {

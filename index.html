@@ -13,7 +13,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>名古屋市営バス時刻表</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261008-copy-status">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
@@ -105,7 +105,13 @@
             <span class="time-value" id="next-duration"></span>
           </div>
         </div>
-        <div class="countdown" id="countdown"></div>
+        <div class="next-bus-actions">
+          <div class="countdown" id="countdown"></div>
+          <div class="copy-action">
+            <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
+            <button id="copy-next-bus-btn" class="copy-btn" type="button" aria-label="次のバスの区間と時刻をコピー" disabled>コピー</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -125,6 +131,6 @@
     <p>データ出典: 名古屋市交通局 GTFS-JPオープンデータ</p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20261008-copy-status"></script>
 </body>
 </html>

@@ -349,8 +349,64 @@ main {
   color: var(--text-secondary);
 }
 
-.countdown {
+.next-bus-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.copy-action {
+  grid-column: 3;
+  justify-self: end;
+  position: relative;
+}
+
+.copy-status {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  min-width: 100%;
+  font-size: 0.7rem;
+  color: var(--primary-dark);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.copy-status:empty {
+  display: none;
+}
+
+.copy-btn {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--primary-dark);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--primary-dark);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: var(--primary-light);
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--primary-dark);
+  outline-offset: 3px;
+}
+
+.copy-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.countdown {
+  grid-column: 2;
   font-size: 1rem;
   font-weight: 600;
   color: var(--accent);
